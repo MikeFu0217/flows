@@ -1,0 +1,28 @@
+import standard as std
+from lib.osc import ClassicSaw
+from lib.mod import ClassicLFO
+from lib.filt import ClassicFilt
+from lib.fx import ClassicDistortion
+from lib.env import ClassicADSR
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    osc = ClassicSaw.make()
+    lfo = ClassicLFO.make()
+    filt = ClassicFilt.make()
+    drive = ClassicDistortion.make()
+    env = ClassicADSR.make()
+    motion = lfo(shape: triangle, sync: 1/4, mode: retrigger,
+                 trigger: key.trigger, bipolar: false, fade: 20ms)
+    cutoff = 300hz + motion * 3khz
+    raw = osc(pitch: key.pitch, level: -22db, unison: 5,
+              detune: 14, spread: 0.85, pan: 0, phase: 0, random: 0.7)
+    filtered = filt(raw, cutoff: cutoff, resonance: 0.2)
+    shaped = drive(filtered, mode: softclip, drive: 12db, mix: 0.65, output: -6db)
+    amp = env(gate: key.gate, trigger: key.trigger,
+              A: 8ms, D: 180ms, S: 0.6, R: 300ms)
+    p_before = probe(filtered)
+    p_after = probe(shaped)
+    color_diff = spec(p_after) - spec(p_before)
+    width = side(shaped)
+    width_power = power(probe(width))
+    return shaped * amp * key.velocity

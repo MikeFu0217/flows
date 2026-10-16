@@ -1,0 +1,28 @@
+name: Bug report
+description: A reproducible problem with sound, source, display or installation.
+body:
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Flows version, OS/CPU, standalone or DAW/plugin format. Include sample rate/block size for audio issues.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps and expected result
+      description: What did you do, what happened, and what should happen?
+    validations:
+      required: true
+  - type: textarea
+    id: instrument
+    attributes:
+      label: Small instrument or example
+      description: Paste the smallest .flows source that demonstrates the problem. Remove secrets and private paths. Share only audio you have permission to distribute.
+      render: text
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs, screenshots or recording
+      description: Remove API keys and private information before attaching files.

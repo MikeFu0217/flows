@@ -1,0 +1,8 @@
+import standard as std
+from lib.osc import ClassicSine
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    mOsc1 = ClassicSine.make()
+
+    raw = mOsc1(pitch: key.pitch, unison: 1, level: -6db)
+    return raw * key.gate * key.velocity

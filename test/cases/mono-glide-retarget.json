@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "id": "mono-glide-retarget",
+  "preset": "../presets/mono-legato-glide.flows",
+  "render": {
+    "sample_rate": 48000,
+    "block_size": 64,
+    "channels": 1,
+    "duration_seconds": 1.7,
+    "seed": 1297702388
+  },
+  "events": [
+    {
+      "time_seconds": 0.0,
+      "type": "note_on",
+      "note_id": "a4",
+      "pitch": 69,
+      "velocity": 0.5
+    },
+    {
+      "time_seconds": 0.5,
+      "type": "note_on",
+      "note_id": "c5",
+      "pitch": 72,
+      "velocity": 0.5
+    },
+    {
+      "time_seconds": 0.55,
+      "type": "note_on",
+      "note_id": "d5",
+      "pitch": 74,
+      "velocity": 0.5
+    },
+    {
+      "time_seconds": 0.75,
+      "type": "note_off",
+      "note_id": "d5",
+      "pitch": 74
+    },
+    {
+      "time_seconds": 0.95,
+      "type": "note_off",
+      "note_id": "c5",
+      "pitch": 72
+    },
+    {
+      "time_seconds": 1.2,
+      "type": "note_off",
+      "note_id": "a4",
+      "pitch": 69
+    }
+  ],
+  "observations": [
+    "key.pitch",
+    "key.gate",
+    "key.trigger",
+    "amp"
+  ],
+  "checks": [
+    {
+      "kind": "finite_audio"
+    },
+    {
+      "kind": "peak_limit",
+      "max_abs": 1.0
+    },
+    {
+      "kind": "silence_window",
+      "start_seconds": 1.55,
+      "end_seconds": 1.65,
+      "max_rms": 1e-05
+    },
+    {
+      "kind": "manual_listen",
+      "description": "Retargeting during glide should continue from the current pitch; overlapping keys must not restart amp."
+    }
+  ],
+  "behavior": [
+    "Only the gate rise at 0 s produces key.trigger. New presses at 0.5 s and 0.55 s keep gate at 1 and send no trigger.",
+    "At 0.5 s, a 100 ms glide begins from pitch 69 to 72, linear in semitones.",
+    "At 0.55 s, key.pitch is 70.5. A new 100 ms glide targets 74 and reaches it at 0.65 s.",
+    "Releasing D5 at 0.75 s glides back to C5, reaching 72 at 0.85 s. Releasing C5 at 0.95 s glides back to A4, reaching 69 at 1.05 s.",
+    "The last key releases at 1.2 s; the 300 ms Release finishes at 1.5 s."
+  ]
+}

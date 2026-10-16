@@ -1,0 +1,14 @@
+import standard as std
+from lib.sample import ClassicSampler
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    sampler = ClassicSampler.make()
+
+    # A complete hit plays once. Note-off does not cut its tail.
+    raw = sampler(
+        file: "Samples/flows-kick.wav", trigger: key.trigger,
+        pitch: key.pitch, root: C3, mode: one_shot,
+        start: 0, end: 1, rate: 1, reverse: false, level: -6db
+    )
+    p_raw = probe(raw)
+    return raw * key.velocity

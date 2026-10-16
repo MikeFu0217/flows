@@ -1,0 +1,10 @@
+import standard as std
+from lib.osc import ClassicSine
+
+# Note names describe MIDI pitch; hz describes frequency directly.
+Inst.sigstream(std.event.keys.poly()) as key:
+    note_osc = ClassicSine.make()
+    hz_osc = ClassicSine.make()
+    tuned = note_osc(pitch: A3, octave: 1, semitune: 0, level: -24db)
+    reference = hz_osc(pitch: 440hz, level: -24db)
+    return (tuned + reference) * key.gate * key.velocity

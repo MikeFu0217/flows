@@ -1,0 +1,29 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "dev",
+      "displayName": "Dev (Ninja, Debug)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "app",
+      "displayName": "macOS application and plugins (Release)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-app",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release", "FLOWS_BUILD_APP": "ON" }
+    }
+  ],
+  "buildPresets": [
+    { "name": "dev", "configurePreset": "dev" },
+    { "name": "app", "configurePreset": "app" }
+  ],
+  "testPresets": [
+    { "name": "dev", "configurePreset": "dev", "output": { "outputOnFailure": true } },
+    { "name": "app", "configurePreset": "app", "output": { "outputOnFailure": true } }
+  ]
+}

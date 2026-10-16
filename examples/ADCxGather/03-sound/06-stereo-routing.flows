@@ -1,0 +1,13 @@
+import standard as std
+from lib.osc import ClassicSaw
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    osc = ClassicSaw.make()
+    raw = osc(pitch: key.pitch, level: -22db, unison: 3, detune: 9, spread: 0.9)
+    center = mid(raw)
+    width = side(raw)
+    narrowed = stereo(center + width * 0.3, center - width * 0.3)
+    signal_left = left(narrowed)
+    signal_right = right(narrowed)
+    signal = stereo(signal_left, signal_right)
+    return signal * key.gate * key.velocity

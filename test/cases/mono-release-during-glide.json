@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "mono-release-during-glide",
+  "preset": "../presets/mono-legato-glide.flows",
+  "render": {
+    "sample_rate": 48000,
+    "block_size": 64,
+    "channels": 1,
+    "duration_seconds": 1.1,
+    "seed": 1297702388
+  },
+  "events": [
+    {
+      "time_seconds": 0.0,
+      "type": "note_on",
+      "note_id": "a4",
+      "pitch": 69,
+      "velocity": 0.5
+    },
+    {
+      "time_seconds": 0.5,
+      "type": "note_on",
+      "note_id": "c5",
+      "pitch": 72,
+      "velocity": 0.5
+    },
+    {
+      "time_seconds": 0.52,
+      "type": "note_off",
+      "note_id": "a4",
+      "pitch": 69
+    },
+    {
+      "time_seconds": 0.55,
+      "type": "note_off",
+      "note_id": "c5",
+      "pitch": 72
+    }
+  ],
+  "observations": [
+    "key.pitch",
+    "key.gate",
+    "key.trigger",
+    "amp"
+  ],
+  "checks": [
+    {
+      "kind": "finite_audio"
+    },
+    {
+      "kind": "peak_limit",
+      "max_abs": 1.0
+    },
+    {
+      "kind": "silence_window",
+      "start_seconds": 0.9,
+      "end_seconds": 1.05,
+      "max_rms": 1e-05
+    },
+    {
+      "kind": "manual_listen",
+      "description": "When the last key releases during glide, pitch continues toward C5 while amp enters Release."
+    }
+  ],
+  "behavior": [
+    "At 0.5 s, a 100 ms glide begins from A4 to C5. The overlapping press sends no trigger.",
+    "Releasing the lower-priority A4 at 0.52 s does not change the target pitch.",
+    "The last key releases at 0.55 s, setting key.gate to 0. Glide continues to C5 at 0.6 s without creating a new target.",
+    "Amp releases from its current value at 0.55 s and finishes at 0.85 s; the same voice is used throughout."
+  ]
+}

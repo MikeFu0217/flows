@@ -1,0 +1,9 @@
+# Matches the style the ADC3 spike settled into: 4-space indent, 100 columns,
+# left-attached pointers/references, access modifiers flush with the class.
+BasedOnStyle: Google
+IndentWidth: 4
+ColumnLimit: 100
+AccessModifierOffset: -4
+PointerAlignment: Left
+DerivePointerAlignment: false
+AllowShortFunctionsOnASingleLine: Inline

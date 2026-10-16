@@ -1,0 +1,16 @@
+import standard as std
+from lib.osc import ClassicSaw
+from lib.filt import ClassicFilt
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    osc = ClassicSaw.make()
+    filt = ClassicFilt.make()
+    raw = osc(pitch: key.pitch, level: -20db)
+    filtered = filt(raw, cutoff: 700hz)
+    removed = raw - filtered
+    # Stateful calls stay outside branches; branches select signal expressions.
+    if key.pitch <= C3:
+        signal = filtered + removed / 4
+    else:
+        signal = filtered
+    return signal * key.gate * key.velocity

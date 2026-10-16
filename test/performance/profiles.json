@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "status": "executable",
+  "description": "Executable engine microbenchmark matrix. Budgets are acceptance targets; individual reports contain measured outcomes.",
+  "deadline_seconds": "block_size / sample_rate",
+  "metrics": [
+    "compile_time_ms",
+    "render_time_p50_us",
+    "render_time_p99_us",
+    "render_time_max_us",
+    "deadline_misses",
+    "rt_allocations",
+    "rt_deallocations",
+    "probe_drops",
+    "probe_capture_bytes",
+    "scratch_buffer_bytes",
+    "retired_program_bytes_peak",
+    "voice_state_bytes",
+    "voice_instance_count",
+    "sounding_voice_count"
+  ],
+  "budgets": {
+    "render_time_p99_deadline_fraction": 0.5,
+    "render_time_max_deadline_fraction": 1.0,
+    "rt_allocations": 0,
+    "deadline_misses": 0
+  },
+  "required_result_metadata": [
+    "machine",
+    "os",
+    "cpu",
+    "audio_driver",
+    "host_version",
+    "build_type",
+    "build_flags",
+    "compiler_toolchain",
+    "dependency_versions",
+    "backend",
+    "optimization_passes",
+    "engine_revision",
+    "compiler_revision",
+    "probe_enabled",
+    "capture_config",
+    "analysis_windows",
+    "gui_workload",
+    "source_hash",
+    "dependency_hash",
+    "asset_hashes",
+    "event_fixture_hash",
+    "dsp_program_digest",
+    "parameter_epoch",
+    "control_epoch",
+    "observation_digest",
+    "sample_rate",
+    "block_size",
+    "channel_count",
+    "voice_count",
+    "seed"
+  ],
+  "measurement_notes": [
+    "Run every sample_rate × block_size × voice_count combination after warmup, with deterministic events generated from seed.",
+    "duration_seconds is the measured render duration; warmup_seconds is excluded from timing statistics.",
+    "render_time metrics cover engine.process, event dispatch, DSP, voice mixing and bounded synchronous capture; they exclude the device callback, host wrapper, Analyzer and GUI.",
+    "Convert microseconds to seconds before comparing callback duration with deadline_seconds.",
+    "rt_allocations and rt_deallocations count heap allocation and release on the audio callback thread during measurement; both must remain zero.",
+    "voice_state_bytes measures memory held by voice DSP state; voice_instance_count and sounding_voice_count distinguish allocated instances from voices currently sounding.",
+    "For held_chord, press all requested voices at the same sample at warmup start, using pitch_start + index * pitch_step; keep every voice held throughout measurement.",
+    "For repeating_case, repeat only the referenced case events at period_seconds offsets from warmup start; rename note_id in each cycle to keep note identities distinct.",
+    "Trim warmup from statistics without resetting engine state or the workload clock; measure the following duration_seconds and omit events at or beyond the render end.",
+    "Compare probe off/on on the same DSP program, with all named signals retained as potential taps; do not compare programs with different dead-code elimination semantics.",
+    "capture_config records signal IDs, voice selectors, channels, full-rate sample rate, ring duration and capture budget; analysis_windows records transform sizes and hop lengths. The native live transport has 128 fixed capture packets of up to 1024 samples and 8 mono channels; its buffered duration depends on callback size. This offline benchmark uses a synchronous bounded capture sink.",
+    "Record zero or an explicit empty configuration for absent captures/assets/GUI, and not_applicable for offline driver/host fields; never omit fingerprint fields silently.",
+    "Measure hot-swap and maximum capture separately from steady-state profiles; include simultaneous program count, scratch/capture memory and retired program peak memory in the report.",
+    "Record the machine, build, engine revision, compiler revision and working-tree source hashes with every execution."
+  ],
+  "benchmarks": [
+    {
+      "id": "poly-scaling",
+      "preset": "../fixtures/instruments/poly-adsr.flows",
+      "sample_rates": [44100, 48000, 96000],
+      "block_sizes": [64, 128, 256],
+      "voice_counts": [1, 8, 32],
+      "duration_seconds": 30,
+      "warmup_seconds": 5,
+      "seed": 1297702388,
+      "workload": {
+        "kind": "held_chord",
+        "pitch_start": 48,
+        "pitch_step": 1,
+        "velocity": 0.1
+      }
+    },
+    {
+      "id": "rolling-single",
+      "preset": "../presets/trance-rolling-bass.flows",
+      "sample_rates": [44100, 48000, 96000],
+      "block_sizes": [64, 128, 256],
+      "voice_counts": [1],
+      "duration_seconds": 30,
+      "warmup_seconds": 5,
+      "seed": 1297702388,
+      "workload": {
+        "kind": "repeating_case",
+        "case": "../cases/rolling-bass-kbbb-138.json",
+        "period_seconds": 1.7391304347826086
+      }
+    }
+  ]
+}

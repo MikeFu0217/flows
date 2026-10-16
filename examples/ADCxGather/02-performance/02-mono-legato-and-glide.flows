@@ -1,0 +1,14 @@
+import standard as std
+from lib.osc import ClassicSaw
+from lib.env import ClassicADSR
+
+voices = std.event.keys.mono(priority: last, retrigger: gate_rise, glide: 120ms)
+
+# Overlapping keys retarget pitch without restarting the envelope.
+Inst.sigstream(voices) as key:
+    osc = ClassicSaw.make()
+    env = ClassicADSR.make()
+    raw = osc(pitch: key.pitch, level: -18db)
+    amp = env(gate: key.gate, trigger: key.trigger, retrigger_from: current,
+              A: 30ms, D: 180ms, S: 0.5, R: 250ms)
+    return raw * amp * key.velocity

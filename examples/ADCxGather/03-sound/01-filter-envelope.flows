@@ -1,0 +1,18 @@
+import standard as std
+from lib.osc import ClassicSaw
+from lib.env import ClassicADSR
+from lib.filt import ClassicFilt
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    osc = ClassicSaw.make()
+    tone_env = ClassicADSR.make()
+    amp_env = ClassicADSR.make()
+    filt = ClassicFilt.make()
+    raw = osc(pitch: key.pitch, level: -20db)
+    motion = tone_env(gate: key.gate, trigger: key.trigger,
+                      A: 2ms, D: 300ms, S: 0.1, R: 100ms)
+    cutoff = 200hz + motion * 3khz
+    filtered = filt(raw, mode: lowpass, cutoff: cutoff, resonance: 0.2)
+    amp = amp_env(gate: key.gate, trigger: key.trigger,
+                  A: 5ms, D: 180ms, S: 0.5, R: 200ms)
+    return filtered * amp * key.velocity

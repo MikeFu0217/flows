@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "id": "mono-priority-retrigger",
+  "preset": "../fixtures/instruments/mono-retrigger.flows",
+  "render": {
+    "sample_rate": 48000,
+    "block_size": 64,
+    "channels": 1,
+    "duration_seconds": 2.0,
+    "seed": 1297702388
+  },
+  "events": [
+    {
+      "time_seconds": 0.0,
+      "type": "note_on",
+      "note_id": "a4",
+      "pitch": 69,
+      "velocity": 0.4
+    },
+    {
+      "time_seconds": 0.5,
+      "type": "note_on",
+      "note_id": "c5",
+      "pitch": 72,
+      "velocity": 0.8
+    },
+    {
+      "time_seconds": 1.0,
+      "type": "note_off",
+      "note_id": "c5",
+      "pitch": 72
+    },
+    {
+      "time_seconds": 1.5,
+      "type": "note_off",
+      "note_id": "a4",
+      "pitch": 69
+    }
+  ],
+  "observations": [
+    "key.pitch",
+    "key.velocity",
+    "key.gate",
+    "key.trigger",
+    "amp"
+  ],
+  "checks": [
+    {
+      "kind": "finite_audio"
+    },
+    {
+      "kind": "peak_limit",
+      "max_abs": 1.0
+    },
+    {
+      "kind": "silence_window",
+      "start_seconds": 1.85,
+      "end_seconds": 1.95,
+      "max_rms": 1e-05
+    },
+    {
+      "kind": "manual_listen",
+      "description": "A4 to C5 to A4 uses one voice throughout. Pressing C5 restarts Attack; returning to A4 does not restart amp."
+    }
+  ],
+  "behavior": [
+    "One key.trigger occurs at 0 s and another at 0.5 s. At 0.5 s, amp restarts a full 10 ms Attack from its current value.",
+    "At 0.5 s, key.pitch immediately becomes 72 and key.velocity becomes 0.8; oscillator phase continues.",
+    "At 1 s, selection returns to the held A4: key.pitch = 69, key.velocity = 0.4, key.gate stays at 1, and no trigger is sent.",
+    "The last key releases at 1.5 s. Pitch and velocity are retained; the 300 ms Release finishes at 1.8 s."
+  ]
+}

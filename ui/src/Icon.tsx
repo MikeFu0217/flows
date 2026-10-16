@@ -1,0 +1,22 @@
+const paths: Record<string, string> = {
+  steps: 'M3 5h4v14H3zM10 5h4v14h-4zM17 5h4v14h-4z',
+  metronome: 'M8 3h8l4 18H4zM12 17l5-11M9 17h6',
+  muted: 'M4 9h4l5-5v16l-5-5H4zM17 9l5 6m0-6-5 6',
+  erase: 'm4 14 9-10 8 7-9 10H8zM9 9l8 7M12 21h9',
+  play: 'm8 5 11 7-11 7Z', stop: 'M6 6h12v12H6z', split: 'M3 4h18v16H3zM12 4v16', rows: 'M3 4h18v16H3zM3 12h18',
+  folder: 'M3 6h7l2 2h9v12H3z', file: 'M6 3h8l4 4v14H6zM14 3v5h5', chevron: 'm9 5 7 7-7 7', down: 'm5 9 7 7 7-7',
+  settings: 'M4 6h16M4 12h16M4 18h16M8 3v6M16 9v6M10 15v6', close: 'm6 6 12 12M6 18 18 6', add: 'M12 5v14M5 12h14',
+  history: 'M3 11a9 9 0 1 1 2.6 7.4M3 4v7h7M12 7v5l3 2',
+  save: 'M5 3h12l3 3v15H4V3zM8 3v6h8V3M8 21v-8h8v8', undo: 'M8 7H3V2M3 7c4-5 14-4 16 3 2 5-2 10-7 10',
+  redo: 'M16 7h5V2M21 7C17 2 7 3 5 10c-2 5 2 10 7 10', arrow: 'M12 19V5m-6 6 6-6 6 6',
+  expand: 'M9 3H3v6M15 3h6v6M3 15v6h6M21 15v6h-6', code: 'm8 6-6 6 6 6m8-12 6 6-6 6m-2-14-4 16',
+  spark: 'm12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3Z', sound: 'M4 9h4l5-5v16l-5-5H4zM17 8c3 2 3 6 0 8',
+  export: 'M5 12v8h14v-8M12 15V3m-5 5 5-5 5 5', import: 'M5 12v8h14v-8M12 3v12m-5-5 5 5 5-5',
+  keyboard: 'M2 5h20v14H2zM6 5v8M10 5v8M14 5v8M18 5v8M6 13v6M10 13v6M14 13v6M18 13v6',
+  'computer-keyboard': 'M2 5h20v14H2zM6 9h1M11 9h1M16 9h1M6 12h1M11 12h1M16 12h1M7 16h10',
+  'sidebar-left': 'M3 4h18v16H3zM9 4v16M5.5 8h1M5.5 12h1M5.5 16h1',
+  'sidebar-right': 'M3 4h18v16H3zM15 4v16M17.5 8h1M17.5 12h1M17.5 16h1',
+  'signal-flow': 'M3 4h18v16H3zM3 13h18M6 16.5h3M9 15v3M9 16.5h5M14 15v3M14 16.5h4',
+  check: 'm5 12 4 4L19 6', circle: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0', headphones: 'M4 14v-3a8 8 0 0 1 16 0v3M4 13h4v8H4zM16 13h4v8h-4z', rename: 'm15 4 5 5M4 20l5-1L20 8a2 2 0 0 0-5-5L4 14zM3 22h18',
+};
+export function Icon({ name, size = 16 }: { name: string; size?: number }) { return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.55" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name] ?? paths.code}/></svg>; }

@@ -1,0 +1,13 @@
+import { useEffect, useState } from 'react';
+import { Icon } from './Icon';
+import { request } from './native';
+import { Parameter, Snapshot } from './types';
+
+export function Macros({ snapshot, parameter, onClose, onResult, onError }: { snapshot: Snapshot | null; parameter: Parameter | null; onClose: () => void; onResult: (result: any) => void; onError: (error: unknown) => void }) {
+  const [binding, setBinding] = useState(parameter?.id || '');
+  useEffect(() => { if (parameter) setBinding(parameter.id); }, [parameter]);
+  const parameters = snapshot?.compile.parameters || [];
+  const selected = parameters.find(p => p.id === binding);
+  const apply = async (method: string, slot: number) => { try { onResult(await request(method, { slot, documentId: snapshot?.document.id, ...(method === 'parameter.export' ? { bindingId: binding } : {}) })); } catch (error) { onError(error); } };
+  return <div className="macros-panel" role="dialog" aria-label="Host automation"><header><div><div className="eyebrow">HOST AUTOMATION</div><h2>Give a parameter a home.</h2></div><button className="icon-button" title="Close macro exports" onClick={onClose}><Icon name="close"/></button></header><label>Source parameter<select value={binding} onChange={event => setBinding(event.target.value)}><option value="">Select a numeric parameter…</option>{parameters.map(p => <option key={p.id} value={p.id}>{p.id} · {p.value}{p.unit || ''}</option>)}</select></label>{selected && <div className="macro-domain">{selected.min}–{selected.max}{selected.unit || ''} <span>{selected.scale || 'linear'} · {selected.update || 'live'}</span></div>}<p>These 32 macro IDs stay fixed in your host. Right-click a number in the code to export it here.</p><div className="macro-slots">{Array.from({ length: 32 }, (_, index) => { const slot = index + 1; const exported = snapshot?.exportedParameters?.find(p => p.slot === slot); return <div className={`macro-slot ${exported?.bound ? 'bound' : ''}`} key={slot}><span className="macro-id">{String(slot).padStart(2, '0')}</span><div><strong title={exported?.bindingId}>{exported ? exported.name || exported.bindingId : 'Unassigned'}</strong><small>{exported ? exported.bound ? 'Bound' : 'Binding unavailable' : 'Available macro'}</small></div><span className="spacer"/>{exported?.value !== undefined && <span className="macro-value">{Number(exported.value.toFixed(3))}</span>}<button className="macro-bind" disabled={!selected} onClick={() => void apply('parameter.export', slot)}>{exported ? 'Replace' : 'Bind'}</button>{exported && <button className="icon-button" title={`Unexport macro ${slot}`} onClick={() => void apply('parameter.unexport', slot)}><Icon name="close" size={12}/></button>}</div>; })}</div></div>;
+}

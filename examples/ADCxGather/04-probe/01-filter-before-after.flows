@@ -1,0 +1,18 @@
+import standard as std
+from lib.osc import ClassicSaw
+from lib.filt import ClassicFilt
+from lib.env import ClassicADSR
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    osc = ClassicSaw.make()
+    filt = ClassicFilt.make()
+    env = ClassicADSR.make()
+    raw = osc(pitch: key.pitch, level: -20db)
+    filtered = filt(raw, mode: lowpass, cutoff: 800hz, resonance: 0.15)
+    amp = env(gate: key.gate, A: 10ms, D: 150ms, S: 0.6, R: 250ms)
+
+    p_before = probe(raw)
+    p_after = probe(filtered)
+
+
+    return filtered * amp * key.velocity

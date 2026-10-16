@@ -1,0 +1,18 @@
+import standard as std
+from lib.osc import ClassicSaw
+from lib.filt import ClassicFilt
+from lib.env import ClassicADSR
+
+class Tone:
+    def signal(input: audio, cutoff: hz = 1khz, resonance: scalar = 0.15):
+        filt = ClassicFilt.make()
+        return filt(input, cutoff: cutoff, resonance: resonance)
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    osc = ClassicSaw.make()
+    tone = Tone.make()
+    env = ClassicADSR.make()
+    raw = osc(pitch: key.pitch, level: -20db)
+    filtered = tone(input: raw, cutoff: 750hz)
+    amp = env(gate: key.gate, A: 10ms, D: 150ms, S: 0.5, R: 250ms)
+    return filtered * amp * key.velocity

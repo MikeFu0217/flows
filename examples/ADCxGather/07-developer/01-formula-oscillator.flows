@@ -1,0 +1,24 @@
+# Developer mode: the waveform formula is authored here.
+import standard as std
+from lib.dsp import Phasor
+from lib.env import ClassicADSR
+
+class HarmonicOsc:
+    def init:
+        self.register_knob(color, default=0, range=(0, 0.8), step=0.01, smoothing=5ms)
+    def signal(pitch: pitch, color: scalar = 0):
+        clock = Phasor.make()
+        phase = clock(freq: pitch_hz(pitch))
+        angle = phase * 6.283185307179586
+        fundamental = sin(angle)
+        harmonic = sin(angle * 2)
+        shaped = (fundamental + color * harmonic) / 2
+        return shaped
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    osc = HarmonicOsc.make()
+    env = ClassicADSR.make()
+    raw = osc(pitch: key.pitch, color: 0)
+    amp = env(gate: key.gate, trigger: key.trigger, A: 8ms, D: 100ms, S: 0.8, R: 180ms)
+    p_wave = probe(raw)
+    return raw * db_gain(-12db) * amp * key.velocity

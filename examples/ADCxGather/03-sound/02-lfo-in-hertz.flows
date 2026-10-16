@@ -1,0 +1,13 @@
+import standard as std
+from lib.osc import ClassicSine
+from lib.mod import ClassicLFO
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    osc = ClassicSine.make()
+    lfo = ClassicLFO.make()
+    raw = osc(pitch: key.pitch, level: -18db)
+    motion = lfo(shape: sine, rate: 3hz, mode: free,
+                 phase: 0, bipolar: true, delay: 100ms, fade: 300ms)
+    amplitude = 0.65 + motion * 0.35
+    p_motion = probe(motion)
+    return raw * amplitude * key.gate * key.velocity

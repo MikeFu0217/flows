@@ -1,0 +1,11 @@
+import standard as std
+from lib.osc import ClassicSaw
+from lib.filt import ClassicFilt
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    mOsc1 = ClassicSaw.make()
+    mFilt1 = ClassicFilt.make()
+
+    raw = mOsc1(pitch: key.pitch, level: -6db)
+    filtered = mFilt1(raw, cutoff: 800hz)
+    return filtered * key.gate * key.velocity

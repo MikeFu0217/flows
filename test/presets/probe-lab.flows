@@ -1,0 +1,46 @@
+import standard as std
+from lib.osc import ClassicSaw as Saw
+from lib.filt import ClassicFilt
+from lib.env import ClassicADSR
+
+class SmoothLowpass(ClassicFilt):
+    def init:
+        self.register_knob(cutoff, default=900hz, range=(80hz, 12khz), step=25hz, scale=log, update=live)
+
+class ToneFilter:
+    def init:
+        self.register_knob(resonance, default=0.2, range=(0, 0.9), step=0.01)
+    def signal(input: audio, cutoff: hz = 900hz, resonance: scalar = 0.1):
+        stage = SmoothLowpass.make()
+        return stage(input, mode: lowpass, cutoff: cutoff, resonance: resonance)
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    osc = Saw.make()
+    filt = ToneFilter.make()
+    env = ClassicADSR.make()
+
+    # DSP: compare the same voice before and after its lowpass
+    raw = osc(pitch: key.pitch, semitune: 0, level: -12db)
+    filtered = filt(input: raw, cutoff: 800hz)
+    amp = env(
+        gate: key.gate, trigger: key.trigger, retrigger_from: current,
+        A: 10ms, D: 200ms, S: 0.5, R: 0.4s
+    )
+    removed = raw - filtered
+    if key.pitch <= C3:
+        signal = filtered + removed / 4
+    else:
+        signal = filtered
+
+    # Observation: these expressions do not change the audio output
+    p_before = probe(raw)
+    p_after = probe(filtered)
+    p_amp = probe(amp)
+    amp_power = power(p_amp)
+    diff = p_before - p_after
+    spectrum_after = spec(p_after)
+    mel_diff = mel_spec(p_before) - mel_spec(p_after)
+    power_diff = power(p_before) - power(p_after)
+    power_percent = 100 * power(p_after) / (power(p_before) + 1e-9)
+
+    return signal * amp * key.velocity

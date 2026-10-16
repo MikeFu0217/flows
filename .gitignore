@@ -1,0 +1,27 @@
+# Private working notes (migration plan etc.) stay out of history.
+REF_*
+
+# Build output and tool caches.
+build*/
+.cache/
+.DS_Store
+__pycache__/
+
+# Reproducible test output is generated locally.
+test/output/
+ui/node_modules/
+ui/dist/
+
+# Local application/plugin release packages.
+/dist/
+
+# Personal workspace, credentials and local publication reports.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.assistant-history.json
+.recovery/
+.sequencers/
+.local/

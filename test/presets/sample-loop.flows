@@ -1,0 +1,26 @@
+import standard as std
+from lib.sample import ClassicSampler
+from lib.env import ClassicADSR
+from lib.filt import ClassicFilt
+from lib.fx import ClassicDistortion
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    sampler = ClassicSampler.make()
+    filt = ClassicFilt.make()
+    drive = ClassicDistortion.make()
+    env = ClassicADSR.make()
+
+    # The loop continues through the envelope's release.
+    raw = sampler(
+        file: "Samples/flows-stereo.wav", trigger: key.trigger,
+        pitch: key.pitch, root: C3, mode: loop,
+        start: 0, end: 1, rate: 1, reverse: false, level: -9db
+    )
+    filtered = filt(raw, mode: lowpass, cutoff: 1800hz, resonance: 0.15)
+    shaped = drive(filtered, mode: softclip, drive: 6db, mix: 0.4, output: -3db)
+    amp = env(gate: key.gate, trigger: key.trigger, A: 10ms, D: 150ms, S: 0.7, R: 250ms)
+
+    p_before = probe(raw)
+    p_after = probe(shaped)
+    color_diff = spec(p_after) - spec(p_before)
+    return shaped * amp * key.velocity

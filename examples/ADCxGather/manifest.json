@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "title": "Flows instrument studies",
+  "compatible_version": "1.1.4+",
+  "demo_route": [
+    "01-signals/01-sine-and-key.flows",
+    "04-probe/01-filter-before-after.flows",
+    "04-probe/02-probe-difference.flows",
+    "06-instruments/01-stereo-motion.flows",
+    "07-developer/01-formula-oscillator.flows"
+  ],
+  "examples": [
+    {
+      "path": "01-signals/01-sine-and-key.flows",
+      "title": "Sine and key signals",
+      "role": "demo",
+      "features": [
+        "Inst.sigstream",
+        "poly",
+        "make",
+        "key.pitch",
+        "key.gate",
+        "key.velocity"
+      ],
+      "play": "Play one note, then a chord. This minimal gate has no release tail."
+    },
+    {
+      "path": "01-signals/02-units-pitch-and-gain.flows",
+      "title": "Units, pitch and gain",
+      "role": "study",
+      "features": [
+        "hz",
+        "khz",
+        "db",
+        "note literal",
+        "octave",
+        "semitune"
+      ],
+      "play": "Any key opens the same 440 Hz pair. Change 440hz slightly to hear beating."
+    },
+    {
+      "path": "01-signals/03-signal-arithmetic.flows",
+      "title": "Signal arithmetic",
+      "role": "study",
+      "features": [
+        "+",
+        "-",
+        "*",
+        "/",
+        "alias"
+      ],
+      "play": "Hold a note, then release it. Use overlapping notes to hear voice behavior."
+    },
+    {
+      "path": "02-performance/01-poly-and-adsr.flows",
+      "title": "Poly and ADSR release",
+      "role": "study",
+      "features": [
+        "poly",
+        "ADSR",
+        "ms",
+        "s",
+        "key.trigger",
+        "retrigger_from"
+      ],
+      "play": "Hold two notes. Release one while keeping the other held; only its own envelope releases."
+    },
+    {
+      "path": "02-performance/02-mono-legato-and-glide.flows",
+      "title": "Mono, legato and glide",
+      "role": "study",
+      "features": [
+        "event policy variable",
+        "mono",
+        "gate_rise",
+        "glide",
+        "priority"
+      ],
+      "play": "Hold a low note, press a higher note, then release the higher note first. Pitch glides back."
+    },
+    {
+      "path": "02-performance/03-mono-retrigger.flows",
+      "title": "Mono retrigger",
+      "role": "study",
+      "features": [
+        "each_press",
+        "zero",
+        "current"
+      ],
+      "play": "Overlap two keys, then change zero to current and compare the attack from a nonzero envelope level."
+    },
+    {
+      "path": "03-sound/01-filter-envelope.flows",
+      "title": "Filter envelope",
+      "role": "study",
+      "features": [
+        "lowpass",
+        "highpass",
+        "cutoff modulation",
+        "ADSR"
+      ],
+      "play": "Hold a note and hear the tone darken. Change lowpass to highpass in the dropdown."
+    },
+    {
+      "path": "03-sound/02-lfo-in-hertz.flows",
+      "title": "LFO in hertz",
+      "role": "study",
+      "features": [
+        "ClassicLFO",
+        "rate",
+        "free",
+        "phase",
+        "bipolar",
+        "delay",
+        "fade"
+      ],
+      "play": "Hold one note. Observe p_motion using a Voice capture. Free phase, delay and fade initialize from engine time; they do not restart on each key."
+    },
+    {
+      "path": "03-sound/03-lfo-tempo-and-trigger.flows",
+      "title": "Tempo and LFO trigger",
+      "role": "study",
+      "features": [
+        "sync",
+        "retrigger",
+        "one_shot",
+        "transport",
+        "sample_hold"
+      ],
+      "play": "Change shape and mode using their dropdowns. Trigger enables retrigger/one_shot; sync enables transport."
+    },
+    {
+      "path": "03-sound/04-unison-and-stereo.flows",
+      "title": "Unison and stereo spread",
+      "role": "study",
+      "features": [
+        "unison",
+        "detune",
+        "spread",
+        "pan",
+        "phase",
+        "random"
+      ],
+      "play": "Use headphones. Compare spread 0 and 0.85, then inspect width_power. Spread changes pan positions, not detune."
+    },
+    {
+      "path": "03-sound/05-distortion-modes.flows",
+      "title": "Distortion modes",
+      "role": "study",
+      "features": [
+        "ClassicDistortion",
+        "softclip",
+        "hardclip",
+        "fold",
+        "drive",
+        "mix",
+        "output"
+      ],
+      "play": "Hold one note and switch softclip, hardclip and fold. Watch added harmonics; match level before judging preference."
+    },
+    {
+      "path": "03-sound/06-stereo-routing.flows",
+      "title": "Stereo routing",
+      "role": "study",
+      "features": [
+        "stereo",
+        "left",
+        "right",
+        "mid",
+        "side"
+      ],
+      "play": "Change both 0.3 values together to 1. Mid/side reconstruction then recovers the original stereo signal."
+    },
+    {
+      "path": "04-probe/01-filter-before-after.flows",
+      "title": "Probe before and after a filter",
+      "role": "demo",
+      "features": [
+        "probe",
+        "listening",
+        "waveform",
+        "spectrum"
+      ],
+      "play": "Hold C3. Inspect and listen to raw and filtered, then drag cutoff. Keep both observations on the same capture selection."
+    },
+    {
+      "path": "04-probe/02-probe-difference.flows",
+      "title": "Compare waveform, spectrum and power",
+      "role": "demo",
+      "features": [
+        "probe subtraction",
+        "spec",
+        "power"
+      ],
+      "play": "Release the key, switch files, then replay C3 at the same velocity and hold it. Inspect diff, spectrum_diff and power_diff in turn; they answer different questions."
+    },
+    {
+      "path": "04-probe/03-control-and-analysis-arithmetic.flows",
+      "title": "Control probes and analysis arithmetic",
+      "role": "study",
+      "features": [
+        "control probe",
+        "mel_spec",
+        "power",
+        "analysis broadcasting",
+        "scientific notation"
+      ],
+      "play": "Choose the sounding Voice for p_amp. Inspect power_percent for the audio power ratio, not a loudness score."
+    },
+    {
+      "path": "05-language/01-class-knob-metadata.flows",
+      "title": "Class knob metadata",
+      "role": "study",
+      "features": [
+        "class inheritance",
+        "def init",
+        "register_knob",
+        "default",
+        "range",
+        "step",
+        "scale",
+        "update"
+      ],
+      "play": "Drag cutoff in code or Signal Flow. Its range and default come from the class. Double-click the knob to reset."
+    },
+    {
+      "path": "05-language/02-typed-composition.flows",
+      "title": "Typed class composition",
+      "role": "study",
+      "features": [
+        "def signal",
+        "typed ports",
+        "port defaults",
+        "nested make",
+        "named input"
+      ],
+      "play": "The class packages a signal graph. Each make gets its own filter state; this is not a reference to another instrument."
+    },
+    {
+      "path": "05-language/03-pure-if-and-note-ranges.flows",
+      "title": "Pure if and note ranges",
+      "role": "study",
+      "features": [
+        "if else",
+        "comparison",
+        "note literal",
+        "pure assignments"
+      ],
+      "play": "Play below and above C3. The lower range blends back part of the waveform difference."
+    },
+    {
+      "path": "06-instruments/01-stereo-motion.flows",
+      "title": "Stereo motion instrument",
+      "role": "demo",
+      "features": [
+        "LFO",
+        "unison",
+        "filter",
+        "distortion",
+        "ADSR",
+        "probe"
+      ],
+      "play": "Play a sustained note or chord. Change LFO shape, distortion mode and spread. Inspect color_diff or width_power separately. Keep capture on Mid for width_power, since width = side(shaped) already extracts Side; Side projection is useful for the stereo p_after."
+    },
+    {
+      "path": "06-instruments/02-rolling-bass-mid-and-sub.flows",
+      "title": "Rolling bass: mid and sub",
+      "role": "study",
+      "features": [
+        "mono",
+        "mid + sub",
+        "filter envelope",
+        "ADSR",
+        "highpass"
+      ],
+      "play": "Use the built-in 138 BPM bass sequence or short MIDI notes. The program makes mid and sub layers; it does not generate a kick."
+    },
+    {
+      "path": "07-developer/01-formula-oscillator.flows",
+      "title": "Developer mode: waveform formula",
+      "role": "demo",
+      "features": [
+        "Phasor",
+        "sin",
+        "pitch_hz",
+        "db_gain",
+        "typed class",
+        "live control",
+        "probe"
+      ],
+      "play": "Hold A3. Inspect raw or p_wave. Drag color from 0 to 0.5, then release. In Edit change sin(angle * 2) to sin(angle * 3), play A3 again, and inspect the moved harmonic. Undo both changes before another take. Use low notes: arbitrary formulas have no automatic anti-aliasing."
+    }
+  ]
+}

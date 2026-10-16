@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "mono-repress-during-release",
+  "preset": "../fixtures/instruments/mono-retrigger.flows",
+  "render": {
+    "sample_rate": 48000,
+    "block_size": 64,
+    "channels": 1,
+    "duration_seconds": 1.1,
+    "seed": 1297702388
+  },
+  "events": [
+    {
+      "time_seconds": 0.0,
+      "type": "note_on",
+      "note_id": "a4",
+      "pitch": 69,
+      "velocity": 0.6
+    },
+    {
+      "time_seconds": 0.2,
+      "type": "note_off",
+      "note_id": "a4",
+      "pitch": 69
+    },
+    {
+      "time_seconds": 0.35,
+      "type": "note_on",
+      "note_id": "c5",
+      "pitch": 72,
+      "velocity": 0.8
+    },
+    {
+      "time_seconds": 0.65,
+      "type": "note_off",
+      "note_id": "c5",
+      "pitch": 72
+    }
+  ],
+  "observations": [
+    "key.pitch",
+    "key.gate",
+    "key.trigger",
+    "amp",
+    "raw"
+  ],
+  "checks": [
+    {
+      "kind": "finite_audio"
+    },
+    {
+      "kind": "peak_limit",
+      "max_abs": 1.0
+    },
+    {
+      "kind": "silence_window",
+      "start_seconds": 1.0,
+      "end_seconds": 1.08,
+      "max_rms": 1e-05
+    },
+    {
+      "kind": "manual_listen",
+      "description": "Pressing C5 during Release starts Attack from the current amp value. Check that gate rise and trigger do not cause two restarts."
+    }
+  ],
+  "behavior": [
+    "A4 enters Release at 0.2 s. It has not finished at 0.35 s, so the same mono voice state is reused.",
+    "At 0.35 s, key.gate rises from 0 to 1 and one key.trigger is sent. Amp starts once, rising from its current value to 1 over 10 ms.",
+    "C5 releases at 0.65 s, starting a 300 ms Release that finishes at 0.95 s."
+  ]
+}

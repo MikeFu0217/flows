@@ -1,0 +1,65 @@
+name: Build and test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    name: Compiler and DSP (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - run: cmake --preset dev
+      - run: cmake --build --preset dev --parallel 2
+      - run: ctest --preset dev
+
+  editor:
+    name: Editor and publication checks
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - run: npm ci --prefix ui
+      - run: npm audit --prefix ui --audit-level=high
+      - run: npm run build --prefix ui
+      - name: UI regression checks
+        shell: bash
+        run: |
+          for flows_test in ui/test/*.test.mjs; do
+            if [[ "$flows_test" != ui/test/languageCompiler.test.mjs ]]; then
+              node "$flows_test"
+            fi
+          done
+      - run: python3 tools/publication_check.py
+
+  macos:
+    name: macOS app and plugins
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - name: Fetch pinned JUCE
+        run: git clone --branch 8.0.7 --depth 1 https://github.com/juce-framework/JUCE.git ../JUCE
+      - run: npm ci --prefix ui
+      - run: cmake --preset app -DJUCE_DIR="$PWD/../JUCE" -DCMAKE_OSX_ARCHITECTURES=arm64
+      - run: cmake --build --preset app --parallel 2
+      - name: Native tests without interactive windows
+        run: ctest --preset app -E 'window_startup|editor_layout'

@@ -1,0 +1,12 @@
+import standard as std
+from lib.osc import ClassicSaw
+from lib.env import ClassicADSR
+
+# Each note gets its own oscillator and envelope state.
+Inst.sigstream(std.event.keys.poly()) as key:
+    osc = ClassicSaw.make()
+    env = ClassicADSR.make()
+    raw = osc(pitch: key.pitch, level: -20db)
+    amp = env(gate: key.gate, trigger: key.trigger, retrigger_from: current,
+              A: 20ms, D: 150ms, S: 0.5, R: 0.4s)
+    return raw * amp * key.velocity

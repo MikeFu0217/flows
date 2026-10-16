@@ -1,0 +1,15 @@
+name: Musical idea or contribution
+description: An example, usability improvement, language proposal or platform contribution.
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What are you trying to do?
+      description: Start with a musical or practical need, with a small example if possible.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: How would it help, and how could we verify it? Platform contributions should include the target OS/toolchain.

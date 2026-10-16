@@ -1,0 +1,13 @@
+import standard as std
+from lib.osc import ClassicSaw
+from lib.env import ClassicADSR
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    osc = ClassicSaw.make()
+    env = ClassicADSR.make()
+    raw = osc(pitch: key.pitch, level: -22db, unison: 5,
+              detune: 12, spread: 0.85, pan: 0, phase: 0, random: 0.7)
+    amp = env(gate: key.gate, A: 15ms, D: 200ms, S: 0.5, R: 350ms)
+    width = side(raw)
+    width_power = power(probe(width))
+    return raw * amp * key.velocity

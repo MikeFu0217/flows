@@ -1,0 +1,8 @@
+import standard as std
+from lib.osc import ClassicSine
+
+# A note supplies pitch, gate and velocity to a signal flow.
+Inst.sigstream(std.event.keys.poly()) as key:
+    osc = ClassicSine.make()
+    raw = osc(pitch: key.pitch, level: -18db)
+    return raw * key.gate * key.velocity

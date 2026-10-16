@@ -1,0 +1,13 @@
+import standard as std
+from lib.osc import ClassicSaw as Saw
+from lib.osc import ClassicSine
+
+# Arithmetic is signal processing. Names keep intermediate results available.
+Inst.sigstream(std.event.keys.poly()) as key:
+    a = Saw.make()
+    b = ClassicSine.make()
+    bright = a(pitch: key.pitch, level: -18db)
+    low = b(pitch: key.pitch, octave: -1, level: -18db)
+    mix = (bright + low) / 2
+    remainder = mix - low / 2
+    return (mix * 0.8 + remainder * 0.2) * key.gate * key.velocity

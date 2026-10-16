@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import ts from 'typescript';
+const source = readFileSync(new URL('../src/samplePath.ts', import.meta.url), 'utf8');
+const js = ts.transpile(source, { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 });
+const { samplePathEdit } = await import(`data:text/javascript;base64,${Buffer.from(js).toString('base64')}`);
+const apply = (source, at, path) => { const edit = samplePathEdit(source, at, path); return source.slice(0, edit.from) + edit.insert + source.slice(edit.to); };
+assert.equal(apply('raw = player(file: "Samples/old.wav", trigger: key.trigger)', 27, 'Samples/new.wav'), 'raw = player(file: "Samples/new.wav", trigger: key.trigger)');
+assert.equal(apply("file: 'Samples/it\\'s.wav'", 16, 'Samples/new.wav'), 'file: "Samples/new.wav"');
+assert.equal(apply('file: ', 6, 'Samples/a"b.wav'), 'file: "Samples/a\\"b.wav"');
+assert.equal(apply('# "comment"\nfile: "old.wav"', 21, 'Samples/new.wav'), '# "comment"\nfile: "Samples/new.wav"');
+assert.equal(apply('file: "unclosed', 7, 'Samples/new.wav'), 'file: "Samples/new.wav"');
+console.log('Sample path insertion: quoted replacement, escaping and comments passed.');

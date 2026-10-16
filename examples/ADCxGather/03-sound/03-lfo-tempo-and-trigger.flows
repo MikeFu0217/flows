@@ -1,0 +1,16 @@
+import standard as std
+from lib.osc import ClassicSaw
+from lib.mod import ClassicLFO
+from lib.filt import ClassicFilt
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    osc = ClassicSaw.make()
+    lfo = ClassicLFO.make()
+    filt = ClassicFilt.make()
+    raw = osc(pitch: key.pitch, level: -20db)
+    motion = lfo(shape: triangle, sync: 1/4, mode: retrigger,
+                 trigger: key.trigger, bipolar: false, phase: 0)
+    cutoff = 250hz + motion * 2khz
+    filtered = filt(raw, cutoff: cutoff, resonance: 0.15)
+    p_motion = probe(motion)
+    return filtered * key.gate * key.velocity

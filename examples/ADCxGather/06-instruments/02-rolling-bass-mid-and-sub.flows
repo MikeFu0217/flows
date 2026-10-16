@@ -1,0 +1,52 @@
+import standard as std
+from lib.osc import ClassicSaw, ClassicSine
+from lib.filt import ClassicFilt
+from lib.env import ClassicADSR
+
+Inst.sigstream(std.event.keys.mono(
+    priority: last,
+    retrigger: each_press,
+    glide: 0ms
+)) as key:
+    mMidOsc = ClassicSaw.make()
+    mSubOsc = ClassicSine.make()
+    mMidHighpass = ClassicFilt.make()
+    mMidLowpass = ClassicFilt.make()
+    mFilterEnv = ClassicADSR.make()
+    mMidAmpEnv = ClassicADSR.make()
+    mSubAmpEnv = ClassicADSR.make()
+
+    # Mid: a saw one octave up, highpassed and shaped by a filter envelope
+    mid_raw = mMidOsc(
+        pitch: key.pitch, octave: 1, unison: 1, level: -16db
+    )
+    filter_env = mFilterEnv(
+        gate: key.gate,
+        trigger: key.trigger,
+        retrigger_from: zero,
+        A: 1ms, D: 70ms, S: 0, R: 15ms
+    )
+    cutoff = 200hz + filter_env * 2.3khz
+    mid_high = mMidHighpass(mid_raw, mode: highpass, cutoff: 120hz)
+    mid_filtered = mMidLowpass(
+        mid_high, mode: lowpass, cutoff: cutoff, resonance: 0.15
+    )
+    mid_amp = mMidAmpEnv(
+        gate: key.gate,
+        trigger: key.trigger,
+        retrigger_from: zero,
+        A: 2ms, D: 95ms, S: 0, R: 20ms
+    )
+    mid = mid_filtered * mid_amp
+
+    # Sub: a mono sine at the played pitch, with its own amplitude envelope
+    sub_raw = mSubOsc(pitch: key.pitch, unison: 1, level: -15db)
+    sub_amp = mSubAmpEnv(
+        gate: key.gate,
+        trigger: key.trigger,
+        retrigger_from: zero,
+        A: 3ms, D: 110ms, S: 0, R: 15ms
+    )
+    sub = sub_raw * sub_amp
+
+    return (mid + sub) * key.velocity

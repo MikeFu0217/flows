@@ -1,0 +1,18 @@
+import standard as std
+from lib.osc import ClassicSaw
+from lib.env import ClassicADSR
+
+voices = std.event.keys.poly()
+
+Inst.sigstream(voices) as key:
+    mOsc1 = ClassicSaw.make()
+    mAmpEnv = ClassicADSR.make()
+
+    raw = mOsc1(pitch: key.pitch, level: -6db)
+    amp = mAmpEnv(
+        gate: key.gate,
+        trigger: key.trigger,
+        retrigger_from: current,
+        A: 0ms, D: 500ms, S: 0.6, R: 900ms
+    )
+    return raw * amp * key.velocity

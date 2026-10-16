@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "poly-same-pitch-identities",
+  "preset": "../fixtures/instruments/poly-adsr.flows",
+  "render": {
+    "sample_rate": 48000,
+    "block_size": 64,
+    "channels": 1,
+    "duration_seconds": 1.95,
+    "seed": 1297702388
+  },
+  "events": [
+    {
+      "time_seconds": 0.0,
+      "type": "note_on",
+      "note_id": "a4-first",
+      "pitch": 69,
+      "velocity": 0.4
+    },
+    {
+      "time_seconds": 0.25,
+      "type": "note_on",
+      "note_id": "a4-second",
+      "pitch": 69,
+      "velocity": 0.4
+    },
+    {
+      "time_seconds": 0.5,
+      "type": "note_off",
+      "note_id": "a4-first",
+      "pitch": 69
+    },
+    {
+      "time_seconds": 0.75,
+      "type": "note_off",
+      "note_id": "a4-second",
+      "pitch": 69
+    }
+  ],
+  "observations": [
+    "key.pitch",
+    "key.gate",
+    "key.trigger",
+    "amp"
+  ],
+  "checks": [
+    {
+      "kind": "finite_audio"
+    },
+    {
+      "kind": "peak_limit",
+      "max_abs": 1.0
+    },
+    {
+      "kind": "silence_window",
+      "start_seconds": 1.7,
+      "end_seconds": 1.9,
+      "max_rms": 1e-05
+    },
+    {
+      "kind": "manual_listen",
+      "description": "The two notes at the same pitch must release separately. Observe each amp rather than judging only the mixed output."
+    }
+  ],
+  "behavior": [
+    "a4-first and a4-second both have pitch 69 but different note_id values, creating two independent voices.",
+    "At 0.5 s, only a4-first enters Release. a4-second keeps key.gate at 1 until 0.75 s.",
+    "The two amp envelopes finish Release at 1.4 s and 1.65 s, respectively."
+  ]
+}

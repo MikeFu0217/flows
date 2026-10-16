@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "sine-a4-reference",
+  "preset": "../presets/sine-reference.flows",
+  "render": {
+    "sample_rate": 48000,
+    "block_size": 64,
+    "channels": 1,
+    "duration_seconds": 0.9,
+    "seed": 1297702388
+  },
+  "events": [
+    {
+      "time_seconds": 0.0,
+      "type": "note_on",
+      "note_id": "a4",
+      "pitch": 69,
+      "velocity": 0.8
+    },
+    {
+      "time_seconds": 0.6,
+      "type": "note_off",
+      "note_id": "a4",
+      "pitch": 69
+    }
+  ],
+  "observations": [
+    "key.pitch",
+    "key.gate",
+    "raw"
+  ],
+  "checks": [
+    {
+      "kind": "finite_audio"
+    },
+    {
+      "kind": "peak_limit",
+      "max_abs": 1.0
+    },
+    {
+      "kind": "dominant_frequency",
+      "start_seconds": 0.1,
+      "end_seconds": 0.5,
+      "hz": 440,
+      "tolerance_hz": 2
+    },
+    {
+      "kind": "silence_window",
+      "start_seconds": 0.65,
+      "end_seconds": 0.85,
+      "max_rms": 1e-05
+    },
+    {
+      "kind": "manual_listen",
+      "description": "The A4 sine should have one stable pitch and stop immediately on release."
+    }
+  ],
+  "behavior": [
+    "A4 is MIDI pitch 69; reference tuning is A4 = 440 Hz.",
+    "At 0 s, one voice starts with key.gate = 1. At 0.6 s, key.gate becomes 0, with no amplitude-envelope tail."
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "filtered-saw-tone",
+  "preset": "../fixtures/instruments/filtered-saw.flows",
+  "render": {
+    "sample_rate": 48000,
+    "block_size": 64,
+    "channels": 1,
+    "duration_seconds": 0.9,
+    "seed": 1297702388
+  },
+  "events": [
+    {
+      "time_seconds": 0.0,
+      "type": "note_on",
+      "note_id": "a3",
+      "pitch": 57,
+      "velocity": 0.8
+    },
+    {
+      "time_seconds": 0.6,
+      "type": "note_off",
+      "note_id": "a3",
+      "pitch": 57
+    }
+  ],
+  "observations": [
+    "key.pitch",
+    "key.gate",
+    "raw",
+    "filtered"
+  ],
+  "checks": [
+    {
+      "kind": "finite_audio"
+    },
+    {
+      "kind": "peak_limit",
+      "max_abs": 1.0
+    },
+    {
+      "kind": "silence_window",
+      "start_seconds": 0.65,
+      "end_seconds": 0.85,
+      "max_rms": 1e-05
+    },
+    {
+      "kind": "manual_listen",
+      "description": "Compare raw and filtered by listening and spectrum; the 800 Hz filter should change the saw's high-frequency content."
+    }
+  ],
+  "behavior": [
+    "Filter memory belongs to the current voice; cutoff stays at 800 Hz.",
+    "This example multiplies output by key.gate, so release at 0.6 s stops output immediately. Evaluate the filter tone through manual listening."
+  ]
+}

@@ -1,0 +1,13 @@
+import standard as std
+from lib.osc import ClassicSine
+from lib.fx import ClassicDistortion
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    osc = ClassicSine.make()
+    drive = ClassicDistortion.make()
+    raw = osc(pitch: key.pitch, level: -12db)
+    shaped = drive(raw, mode: softclip, drive: 18db, mix: 0.6, output: -18db)
+    p_before = probe(raw)
+    p_after = probe(shaped)
+    spectrum_after = spec(p_after)
+    return shaped * key.gate * key.velocity

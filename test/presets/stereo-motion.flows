@@ -1,0 +1,45 @@
+import standard as std
+from lib.osc import ClassicSaw
+from lib.env import ClassicADSR
+from lib.filt import ClassicFilt
+from lib.mod import ClassicLFO
+from lib.fx import ClassicDistortion
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    osc = ClassicSaw.make()
+    lfo = ClassicLFO.make()
+    filt = ClassicFilt.make()
+    drive = ClassicDistortion.make()
+    env = ClassicADSR.make()
+
+    # A quarter-note LFO restarts for each key trigger
+    motion = lfo(
+        shape: triangle, sync: 1/4, mode: retrigger,
+        trigger: key.trigger, phase: 0, bipolar: false,
+        delay: 0ms, fade: 20ms
+    )
+    cutoff = 300hz + motion * 3khz
+
+    # Five detuned oscillators spread across the stereo field
+    raw = osc(
+        pitch: key.pitch, level: -15db, unison: 5,
+        detune: 14, spread: 0.85, pan: 0, phase: 0, random: 0.7
+    )
+    filtered = filt(raw, mode: lowpass, cutoff: cutoff, resonance: 0.2)
+    shaped = drive(filtered, mode: softclip, drive: 12db, mix: 0.65, output: -6db)
+    amp = env(
+        gate: key.gate, trigger: key.trigger, retrigger_from: current,
+        A: 8ms, D: 180ms, S: 0.6, R: 300ms
+    )
+
+    # Stereo can also be split, processed and recombined in code
+    signal_left = left(shaped)
+    signal_right = right(shaped)
+    signal = stereo(signal_left, signal_right)
+    width = side(signal)
+    p_before = probe(filtered)
+    p_after = probe(shaped)
+    color_diff = spec(p_after) - spec(p_before)
+    width_power = power(probe(width))
+
+    return signal * amp * key.velocity

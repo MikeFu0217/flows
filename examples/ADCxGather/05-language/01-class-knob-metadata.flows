@@ -1,0 +1,15 @@
+import standard as std
+from lib.osc import ClassicSaw
+from lib.filt import ClassicFilt
+
+class GentleFilter(ClassicFilt):
+    def init:
+        self.register_knob(cutoff, default=900hz, range=(80hz, 12khz), step=25hz, scale=log, update=live)
+        self.register_knob(resonance, default=0.15, range=(0, 0.8), step=0.01, scale=linear, update=live)
+
+Inst.sigstream(std.event.keys.poly()) as key:
+    osc = ClassicSaw.make()
+    filt = GentleFilter.make()
+    raw = osc(pitch: key.pitch, level: -20db)
+    filtered = filt(raw, cutoff: 900hz)
+    return filtered * key.gate * key.velocity
