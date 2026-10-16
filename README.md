@@ -7,6 +7,10 @@ Name an intermediate signal, attach a `probe`, and hear or inspect what a
 processing stage actually changes. The code editor, parameter controls, Signal
 Flow and AI assistant all work with the same instrument source.
 
+![Flows showing instrument source, parameter controls and live signal analysis](docs/images/flows.png)
+
+*A saw oscillator through a lowpass filter, with probes before and after processing.*
+
 [Download the macOS preview](https://github.com/flows-audio/flows/releases/latest)
 · [Language and instruments](docs/LANGUAGE.md)
 · [Architecture](docs/ARCHITECTURE.md)
@@ -74,6 +78,19 @@ instruments and comparisons.
   mute, swing, scales and a metronome.
 - Portable `.flowsinst` instruments, source undo, workspace recovery and
   an optional assistant with compile/render/compare tools.
+
+## Built with
+
+| Technology | Role in Flows |
+| --- | --- |
+| C++20 | Flows' own language compiler, DSP engine and signal analysis |
+| [JUCE 8](https://github.com/juce-framework/JUCE/tree/8.0.7) | Native app, audio/MIDI devices, AU/VST3 wrappers and embedded WebView |
+| [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) | Workspace, sequencer, Signal Flow and assistant interface |
+| [CodeMirror 6](https://codemirror.net/) + [Lezer](https://lezer.codemirror.net/) | Code editing and syntax highlighting, with Flows-specific completion and controls |
+| Canvas 2D + SVG | Signal plots and the flow diagram |
+
+CMake/Ninja build the C++ targets; Vite bundles the frontend. Dependency
+versions, notices and licenses are documented in [THIRD_PARTY.md](THIRD_PARTY.md).
 
 ## Platform status and limits
 
