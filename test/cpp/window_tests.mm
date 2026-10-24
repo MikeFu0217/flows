@@ -841,7 +841,14 @@ private:
                         require(!document.body.classList.contains('flow-knob-dragging'),'Escape left an active drag');
                         // The same travel in source must produce the same value as
                         // the graph, and update every copy of its knob immediately.
-                        const number=[...editor.querySelectorAll('.draggable-number')].find(n=>n.dataset.parameterId===id);
+                        const findNumber=()=>[...editor.querySelectorAll('.draggable-number')].find(n=>n.dataset.parameterId===id);
+                        // CodeMirror virtualizes lines. Locate the source control
+                        // at any text size instead of assuming it is already in DOM.
+                        const scroller=editor.cmTile.root.view.scrollDOM;
+                        for(let top=0;!findNumber() && top<scroller.scrollHeight;top+=Math.max(1,scroller.clientHeight/2)) {
+                            scroller.scrollTop=top; await wait(40);
+                        }
+                        const number=findNumber();
                         require(number, 'Missing source number for cross-surface drag');
                         number.scrollIntoView({block:'center',inline:'center'}); await frame();
                         const nr=number.getBoundingClientRect(), nx=nr.x+nr.width/2, ny=nr.y+nr.height/2;
@@ -1152,7 +1159,7 @@ private:
             switch (interactionStep_) {
                 case 0: {
                     if (!compiled || !uiConsistent || !static_cast<bool>(get(state, "graphReady")) || str(state, "knobId").isEmpty()) return;
-                    check(font == 16, "A fresh workspace must use 16px editor text.");
+                    check(font == 14, "A fresh workspace must use 14px editor text.");
                     // A code editor's line pitch has to be uniform whether or not a
                     // line carries signal capsules, as in VSCode.
                     const auto heights = get(state, "lineHeights");
@@ -1175,13 +1182,13 @@ private:
                     break;
                 }
                 case 1:
-                    if (font != 17 || static_cast<int>(get(prefs, "fontSize")) != 17) return;
+                    if (std::abs(font - 14.0 * 17.0 / 16.0) > 0.02 || static_cast<int>(get(prefs, "fontSize")) != 17) return;
                     checkInterfaceFonts(state, 17.0 / 16.0);
                     interactionAction_ = "font-down";
                     ++interactionStep_;
                     break;
                 case 2: {
-                    if (font != 16 || static_cast<int>(get(prefs, "fontSize")) != 16 || !compiled) return;
+                    if (font != 14 || static_cast<int>(get(prefs, "fontSize")) != 16 || !compiled) return;
                     checkInterfaceFonts(state, 1.0);
                     originalSource_ = source;
                     originalPath_ = str(document, "path");
@@ -1243,7 +1250,7 @@ private:
                     const auto savedPrefs = get(saved, "preferences");
                     if (std::abs(static_cast<double>(get(savedPrefs, "leftWidth")) - width) > 1 ||
                         static_cast<int>(get(savedPrefs, "fontSize")) != 16) return;
-                    check(font == 16 && static_cast<bool>(get(state, "endpointsValid")) && !static_cast<bool>(get(state, "forbidden")),
+                    check(font == 14 && static_cast<bool>(get(state, "endpointsValid")) && !static_cast<bool>(get(state, "forbidden")),
                           "Panel resizing disturbed editor font or graph integrity.");
                     interactionAction_ = "pointer-down";
                     ++interactionStep_;
