@@ -319,6 +319,33 @@ void standalone_transport_tests() {
     FlowsProcessor p(true);
     p.prepareToPlay(48000,128);
     apply(p,code);ready(p);
+    const auto probeFixture = File(__FILE__).getParentDirectory().getParentDirectory().getParentDirectory()
+        .getChildFile("examples/ADCxGather/04-probe/01-filter-before-after.flows");
+    check(probeFixture.existsAsFile(), "Missing filter/probe idle fixture.");
+    apply(p, probeFixture.loadFileAsString()); ready(p);
+    // A stopped standalone must send exact digital silence, including when
+    // its metronome is armed. Check multiple beats and callback boundaries;
+    // a single quiet block would miss a periodic click.
+    auto sequence = get(p.snapshot(), "sequencer").clone();
+    sequence.getDynamicObject()->setProperty("metronome", object({{"mute", false}, {"division", 16}, {"volume", 0.0}}));
+    p.request("sequencer.set", object({{"documentId", str(document(p), "id")},
+        {"baseRevision", get(sequence, "revision")}, {"pattern", sequence}}));
+    for (const int frames : {64, 512, 2048}) {
+        AudioBuffer<float> idle(2, frames); MidiBuffer noNotes;
+        for (int block = 0; block < 48000 * 4 / frames; ++block) {
+            for (int channel = 0; channel < 2; ++channel)
+                std::fill_n(idle.getWritePointer(channel), frames, std::numeric_limits<float>::quiet_NaN());
+            p.processBlock(idle, noNotes);
+            for (int channel = 0; channel < 2; ++channel)
+                for (int sample = 0; sample < frames; ++sample)
+                    check(idle.getSample(channel, sample) == 0.0f, "Stopped standalone emitted audio with no key held.");
+        }
+    }
+    sequence.getDynamicObject()->setProperty("metronome", object({{"mute", true}, {"division", 4}, {"volume", -12.0}}));
+    sequence.getDynamicObject()->setProperty("revision", get(get(p.snapshot(), "sequencer"), "revision"));
+    p.request("sequencer.set", object({{"documentId", str(document(p), "id")},
+        {"baseRevision", get(sequence, "revision")}, {"pattern", sequence}}));
+    apply(p, code); ready(p);
     // Match the minimal device-clock playhead injected by JUCE's
     // AudioProcessorPlayer: times are present, transport fields are absent.
     struct DevicePlayHead final:AudioPlayHead {

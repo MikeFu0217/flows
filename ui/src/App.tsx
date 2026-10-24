@@ -257,7 +257,7 @@ export function App() {
   }, [receive, notifyError]);
   useEffect(() => {
     document.documentElement.dataset.theme = theme; document.documentElement.style.setProperty('--app-opacity', String(windowTransparency ? opacity : 1));
-    document.documentElement.style.setProperty('--editor-font', `${fontFamily || DEFAULT_FONT}, monospace`); document.documentElement.style.setProperty('--editor-size', `${fontSize}px`);
+    document.documentElement.style.setProperty('--editor-font', `${fontFamily || DEFAULT_FONT}, monospace`); document.documentElement.style.setProperty('--editor-size', `${14 * fontSize / 16}px`);
     document.documentElement.style.fontSize = `${12 * fontSize / 16}px`;
   }, [theme, opacity, fontFamily, fontSize, windowTransparency]);
   useEffect(() => {
