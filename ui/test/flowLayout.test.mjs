@@ -37,3 +37,15 @@ console.log('Flow layout: dropdown rows preserve knob space, avoid overlap and s
 const filtered = visibleFlowGraph({nodes:[node('key.pitch'),node('key.gate'),node('key.velocity'),node('probe'),node('out')], edges:[{source:'key.pitch',target:'out'}, {source:'key.velocity',target:'probe'}],output:'out'});
 assert.deepEqual(filtered.nodes.map(n=>n.id),['key.pitch','key.velocity','probe','out']);
 assert.equal(filtered.edges.length,2);
+
+// Interface text scaling must reserve enough room for every card and choice row.
+for (const scale of [.625, 1.0625, 1.5, 2]) {
+  const scaled = layoutFlow(graph, parameters, choices, scale);
+  assert.deepEqual(scaled.edges, expanded.edges);
+  assert.equal(scaled.nodes.length, expanded.nodes.length);
+  for (let i = 0; i < scaled.nodes.length; i++) {
+    const n = scaled.nodes[i], original = expanded.nodes[i];
+    for (const metric of ['x', 'y', 'width', 'height']) assert.equal(n[metric], original[metric] * scale);
+    assert.ok(n.x + n.width <= scaled.width + .001 && n.y + n.height <= scaled.height + .001);
+  }
+}

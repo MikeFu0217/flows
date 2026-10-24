@@ -14,6 +14,7 @@ import { ChoiceSelect } from './ChoiceMenu';
 import { applyChoice } from './choice';
 
 export interface DataflowProps {
+  fontScale?: number;
   graph?: FlowGraph | null;
   parameters: Parameter[];
   choices: Choice[];
@@ -211,7 +212,7 @@ export function Dataflow(props: DataflowProps) {
   const choiceMap = useMemo(() => new Map(cache.current.choices.map(choice => [choice.id, choice])), [cache.current.choices]);
   const signature = JSON.stringify({ nodes: graph.nodes.map(node => [node.id, node.op, node.parameterIds.filter(id => parameterMap.has(id)), (node.choiceIds || []).filter(id => choiceMap.has(id))]), edges: graph.edges.map(edge => [edge.id, edge.source, edge.target]) });
   // Node geometry depends on topology, not a source number or a telemetry frame.
-  const geometry = useMemo(() => layoutFlow(graph, parameterMap, choiceMap), [signature]);
+  const geometry = useMemo(() => layoutFlow(graph, parameterMap, choiceMap, props.fontScale), [signature, props.fontScale]);
   // Source spans move when a literal changes width; geometry can stay put.
   const currentNodes = new Map(graph.nodes.map(node => [node.id, node]));
   const layout = { ...geometry, nodes: geometry.nodes.map(node => ({ ...node, ...currentNodes.get(node.id) })) };
@@ -267,7 +268,7 @@ export function Dataflow(props: DataflowProps) {
   const positioned = new Map(layout.nodes.map(node => [node.id, node]));
   const edgePath = (source: string, target: string) => {
     const a = positioned.get(source)!, b = positioned.get(target)!;
-    const x1 = a.x + a.width, y1 = a.y + Math.min(a.height / 2, 68), x2 = b.x, y2 = b.y + Math.min(b.height / 2, 68);
+    const x1 = a.x + a.width, y1 = a.y + Math.min(a.height / 2, 68 * (props.fontScale ?? 1)), x2 = b.x, y2 = b.y + Math.min(b.height / 2, 68 * (props.fontScale ?? 1));
     const bend = Math.max(42, (x2 - x1) * .5);
     return `M${x1},${y1} C${x1 + bend},${y1} ${x2 - bend},${y2} ${x2},${y2}`;
   };
@@ -313,7 +314,7 @@ export function Dataflow(props: DataflowProps) {
             const compact = node.signal.startsWith('key.') && !nodeChoices.length && !nodeParameters.length;
             return <article key={node.id} className={`flow-node ${node.kind} ${compact ? 'event-node' : ''} ${node.id === graph.output ? 'output-node' : ''} ${selected === node.id ? 'selected' : ''} ${selected && !active.has(node.id) ? 'dimmed' : ''}`} data-node-id={node.id} data-signal={node.signal}
               style={{ left: node.x, top: node.y, width: node.width, height: node.height, '--flow-colour': colour(node.kind) } as CSSProperties}>
-              <span className="flow-port input"/><span className="flow-port output"/>
+              <span className="flow-port input" style={{ top: `calc(${Math.min(node.height / 2, 68 * (props.fontScale ?? 1))}px - 0.083333rem)` }}/><span className="flow-port output" style={{ top: `calc(${Math.min(node.height / 2, 68 * (props.fontScale ?? 1))}px - 0.083333rem)` }}/>
               <button className="flow-node-title" onClick={() => select(node)} title={`Reveal ${node.label} in code`}><ModuleGlyph op={node.op}/><span><small>{node.id === graph.output ? 'INSTRUMENT OUT' : opLabel[node.op] || node.op.replace(/_/g, ' ').toUpperCase()}</small><strong>{node.label === '$output' ? 'Output' : node.label}</strong></span><span className="flow-source-line">↗</span></button>
               {!compact && <><MiniSignal node={node} signal={props.signals?.find(signal => signal.name === node.signal)} documentId={props.documentId} onSelect={() => props.onObserve([node.signal])} onInspect={() => { select(node); props.onInspect(node.signal); }} error={props.observation?.error} waiting={!!props.observation?.skipped[node.signal]}/>{nodeChoices.length > 0 && choiceControls(nodeChoices)}{nodeParameters.length > 0 && <div className="flow-knobs">{nodeParameters.slice(0, 4).map(parameter => <ParameterKnob key={`${props.documentId}:${parameter.id}`} parameter={parameter} source={props.source} documentId={props.documentId} disabled={!readable} onChange={props.onChange}/>)}</div>}</>}
               <div className="flow-node-actions"><button aria-label={`Inspect ${node.signal}`} title={`Probe ${node.signal}`} onClick={() => { select(node); props.onInspect(node.signal); }}><Icon name="expand" size={12}/></button>{(props.signals?.find(signal => signal.name === node.signal)?.auditionable ?? node.kind === 'audio') && <button aria-label={props.audition === node.signal ? `Stop listening to ${node.signal}` : `Listen to ${node.signal}`} aria-pressed={props.audition === node.signal} disabled={props.listenPending} className={props.audition === node.signal ? 'listening' : ''} onClick={() => { select(node); props.onListen(node.signal, props.audition !== node.signal); }}><Icon name="headphones" size={12}/></button>}</div>

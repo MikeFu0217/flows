@@ -88,6 +88,13 @@ assert(labels.includes('LINEAR · AUTO') && labels.includes('+0.05'),'Waveform d
 globalThis.plotFrame.signals[0]={name:'raw',kind:'audio',shape:'waveform',values:[-.02,.02],peak:.02};
 drawSignalPlot(canvas,'raw');
 assert(labels.includes('+1') && !labels.includes('LINEAR · AUTO'),'Ordinary audio keeps its calibrated full-scale waveform axis');
+canvas.ownerDocument={documentElement:{style:{fontSize:'24px'}}};
+drawSignalPlot(canvas,'raw');
+assert.equal(context.font,'18px ui-monospace, monospace','Plot labels follow 200% interface text size');
+assert(paths.flat().every(point=>point.every(Number.isFinite)),'Scaled plot coordinates remain finite');
+canvas.ownerDocument.documentElement.style.fontSize='7.5px';
+drawSignalPlot(canvas,'raw');
+assert.equal(context.font,'5.625px ui-monospace, monospace','Plot labels follow the minimum interface text size');
 delete globalThis.plotFrame;
 delete globalThis.window;
 console.log('Difference renderer: visible signed 800 Hz result, labelled automatic range, exact zero, unchanged samples and unsigned waveform FFT passed.');

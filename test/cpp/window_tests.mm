@@ -131,6 +131,17 @@ private:
     std::unique_ptr<FlowsProcessor> processor_;
     std::unique_ptr<TestWindow> window_;
     std::shared_ptr<int> alive_ = std::make_shared<int>(0);
+    var interfaceFonts_;
+    void checkInterfaceFonts(const var& state, double scale) {
+        const auto current = get(state, "interfaceFonts");
+        check(interfaceFonts_.isArray() && current.isArray(), "Missing interface font measurements.");
+        for (int i = 0; i < interfaceFonts_.size(); ++i) {
+            const auto before = static_cast<double>(interfaceFonts_[i]);
+            check(before > 0, "Missing interface text region.");
+            check(std::abs(static_cast<double>(current[i]) - before * scale) < .02,
+                  "Interface text did not scale with the editor.");
+        }
+    }
     File workspace_, snapshotFile_;
     NativeIdentity baseline_;
     WKWebView* webIdentity_ = nil; // Owned by this test's editor; never retained across teardown.
@@ -955,6 +966,10 @@ private:
                 };
                 const rawCapsule = [...(editor?.querySelectorAll('.signal-capsule') || [])].find(element => element.querySelector('span')?.textContent === 'raw');
                 return JSON.stringify({
+                    interfaceFonts: ['.file-entry', '.panel-heading > span', '.compile-button', '.flow-node-title strong', '.agent-panel', '.keyboard-strip'].map(selector => {
+                        const element = document.querySelector(selector);
+                        return element ? parseFloat(getComputedStyle(element).fontSize) : 0;
+                    }),
                     font: editor ? parseFloat(getComputedStyle(editor).fontSize) : 0,
                     // Inline signal capsules are widgets inside .cm-line. Their box
                     // must not enlarge the line box, or the editor's line pitch
@@ -1154,17 +1169,20 @@ private:
                     check(!static_cast<bool>(get(state, "forbidden")), "Read-only dataflow exposes graph topology editing controls.");
                     check(static_cast<bool>(get(state, "separator")), "Explorer resize separator is missing.");
                     graphSignature_ = str(state, "signature");
+                    interfaceFonts_ = get(state, "interfaceFonts").clone();
                     interactionAction_ = "font-up";
                     ++interactionStep_;
                     break;
                 }
                 case 1:
                     if (font != 17 || static_cast<int>(get(prefs, "fontSize")) != 17) return;
+                    checkInterfaceFonts(state, 17.0 / 16.0);
                     interactionAction_ = "font-down";
                     ++interactionStep_;
                     break;
                 case 2: {
                     if (font != 16 || static_cast<int>(get(prefs, "fontSize")) != 16 || !compiled) return;
+                    checkInterfaceFonts(state, 1.0);
                     originalSource_ = source;
                     originalPath_ = str(document, "path");
                     knobId_ = str(state, "knobId");

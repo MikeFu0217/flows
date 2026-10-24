@@ -11,10 +11,11 @@ export function drawSignalPlot(canvas: HTMLCanvasElement, name: string, color = 
   spectrum ||= intrinsic;
   const values = spectrum ? signal?.spectrum ?? (intrinsic ? signal?.values : undefined) : signal?.values;
   const w = canvas.width, h = canvas.height, dpr = window.devicePixelRatio || 1;
+  const textScale = (parseFloat(canvas.ownerDocument?.documentElement.style.fontSize) || 12) / 12;
   const large = w / dpr > 360 && h / dpr > 75;
-  const pad = large ? 20*dpr : 2*dpr, bottom = large ? h-21*dpr : h-2*dpr, top = large ? 9*dpr : 2*dpr;
+  const pad = large ? 20*dpr : 2*dpr, bottom = large ? h-21*dpr*textScale : h-2*dpr, top = large ? 9*dpr : 2*dpr;
   const autoLinear = !!signal?.signedSpectrum && (!spectrum || intrinsic);
-  const left = large ? (autoLinear ? 64 : 35)*dpr : 0, right = w-(large ? 14*dpr : 0), width = right-left, height = bottom-top;
+  const left = large ? (autoLinear ? 64 : 35)*dpr*textScale : 0, right = w-(large ? 14*dpr : 0), width = right-left, height = bottom-top;
   ctx.clearRect(0,0,w,h);
   if (!signal || !values?.length || signal?.valid === false || signal?.error || signal?.shape === 'scalar') { scenes.delete(canvas); return; }
   const key = JSON.stringify([name, spectrum, scope, frame.programRevision, frame.generation, frame.parameterEpoch, frame.observationEpoch, frame.captureMode, frame.captureMode === 'key' ? frame.keyEpoch : 0]);
@@ -26,7 +27,7 @@ export function drawSignalPlot(canvas: HTMLCanvasElement, name: string, color = 
   // Commit the completed acquisition once, including its last waveform bins.
   if (acquired) scene.envelope = new BeatEnvelope();
   const dt = Math.min(.1, Math.max(0,(now-scene.time)/1000)); scene.time = now;
-  ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.font = `${9*dpr}px ui-monospace, monospace`;
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.font = `${9*dpr*textScale}px ui-monospace, monospace`;
   const line = (x1:number,y1:number,x2:number,y2:number,alpha=.1) => { ctx.strokeStyle=`rgba(170,202,191,${alpha})`;ctx.lineWidth=dpr*.6;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke(); };
   const text = (label:string,x:number,y:number) => {ctx.fillStyle='rgba(170,194,182,.62)';ctx.fillText(label,x,y);};
   const curve = (points: number[], x: (i: number) => number, y: (value: number) => number, join = false) => {
