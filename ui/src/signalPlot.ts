@@ -11,7 +11,7 @@ export function drawSignalPlot(canvas: HTMLCanvasElement, name: string, color = 
   spectrum ||= intrinsic;
   const values = spectrum ? signal?.spectrum ?? (intrinsic ? signal?.values : undefined) : signal?.values;
   const w = canvas.width, h = canvas.height, dpr = window.devicePixelRatio || 1;
-  const textScale = (parseFloat(document.documentElement.style.fontSize) || 12) / 12;
+  const textScale = (parseFloat(canvas.ownerDocument?.documentElement.style.fontSize) || 12) / 12;
   const large = w / dpr > 360 && h / dpr > 75;
   const pad = large ? 20*dpr : 2*dpr, bottom = large ? h-21*dpr*textScale : h-2*dpr, top = large ? 9*dpr : 2*dpr;
   const autoLinear = !!signal?.signedSpectrum && (!spectrum || intrinsic);
