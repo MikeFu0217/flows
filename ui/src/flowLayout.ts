@@ -5,7 +5,7 @@ export interface Layout { nodes: PlacedNode[]; edges: FlowEdge[]; width: number;
 const WIDTH = 206, COLUMN = 290, GAP = 28, MARGIN = 44;
 
 // The compiler owns topology. This pass only places its named signals on screen.
-export function layoutFlow(graph: FlowGraph, parameters: Map<string, Parameter>, choices: Map<string, Choice> = new Map()): Layout {
+export function layoutFlow(graph: FlowGraph, parameters: Map<string, Parameter>, choices: Map<string, Choice> = new Map(), fontScale = 1): Layout {
   const ids = new Set(graph.nodes.map(node => node.id));
   const byId = new Map(graph.nodes.map(node => [node.id, node]));
   const authoredOrder = new Map(graph.nodes.map((node, index) => [node.id, index]));
@@ -69,7 +69,10 @@ export function layoutFlow(graph: FlowGraph, parameters: Map<string, Parameter>,
       y += height + GAP;
     }
   }
-  return { nodes, edges, width: MARGIN * 2 + Math.max(0, ...rank.values()) * COLUMN + WIDTH, height: totalHeight + MARGIN * 2 };
+  // Scale geometry with text so cards and their ports keep matching at every size.
+  const scale = Number.isFinite(fontScale) ? Math.max(.625, Math.min(2, fontScale)) : 1;
+  return { nodes: nodes.map(node => ({ ...node, x: node.x * scale, y: node.y * scale, width: node.width * scale, height: node.height * scale })), edges,
+    width: (MARGIN * 2 + Math.max(0, ...rank.values()) * COLUMN + WIDTH) * scale, height: (totalHeight + MARGIN * 2) * scale };
 }
 
 export function pathToNode(graph: FlowGraph, selected: string | null): Set<string> {

@@ -16,6 +16,14 @@ Flow and AI assistant all work with the same instrument source.
 · [Architecture](docs/ARCHITECTURE.md)
 · [Source-guided learning](docs/learn/README.md)
 
+## Interface text size
+
+**Cmd/Ctrl +**, **Cmd/Ctrl −** and **Cmd/Ctrl 0** resize or reset text throughout
+the interface: editor, Explorer, assistant, Signal Flow, sequencer and menus.
+Appearance → **Interface text size** controls the same saved preference.
+The default is 100% (16px in the editor); other text keeps its relative size.
+**Editor font** still selects the code typeface independently.
+
 ## Try it
 
 The downloadable preview runs on **Apple Silicon Macs**. Unzip `Flows.app`,
